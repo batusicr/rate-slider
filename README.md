@@ -1,1 +1,1 @@
-# rate-slider
+# Rate slider
