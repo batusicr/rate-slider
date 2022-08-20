@@ -11,7 +11,7 @@ class Slider {
         this.container = document.querySelector(this.DOMselector);  // Slider container
         this.slider = slider;                                       // Slider options
         this.minAngle = 36;                                         // Slider minimum angle
-        this.maxAngle = 324;                                        // Slider maximun angle
+        this.maxAngle = 324;                                        // Slider maximum angle
         this.sliderWidth = 400;                                     // Slider width
         this.sliderHeight = 400;                                    // Slider length
         this.cx = this.sliderWidth / 2;                             // Slider center X coordinate
@@ -34,8 +34,6 @@ class Slider {
         // Create SVG
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('viewBox', `0, 0, ${this.sliderWidth}, ${this.sliderHeight}`)
-        svg.setAttribute('height', this.sliderWidth);
-        svg.setAttribute('width', this.sliderHeight);
 
         // Create SVG container
         const svgContainer = document.createElement('div');
