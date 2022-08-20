@@ -12,17 +12,17 @@ class Slider {
         this.slider = slider;                                       // Slider options
         this.minAngle = 36;                                         // Slider minimum angle
         this.maxAngle = 324;                                        // Slider maximum angle
-        this.sliderRadius = 150;                                    // Slider radius
-        this.sliderWidth = 400;                                     // Slider width
-        this.sliderHeight = 400;                                    // Slider length
+        this.sliderRadius = 80;                                     // Slider radius
+        this.sliderWidth = 200;                                     // Slider width
+        this.sliderHeight = 200;                                    // Slider length
         this.cx = this.sliderWidth / 2;                             // Slider center X coordinate
         this.cy = this.sliderHeight / 2;                            // Slider center Y coordinate
         this.tau = 2 * Math.PI;                                     // Tau constant
-        this.arcFractionThickness = 15;                             // Arc fraction thickness
+        this.arcFractionThickness = 8;                              // Arc fraction thickness
         this.arcBgFractionColor = '#D8D8D8';                        // Arc fraction color for background slider
         this.handleFillColor = '#fff';                              // Slider handle fill color
         this.handleStrokeColor = '#888888';                         // Slider handle stroke color
-        this.handleStrokeThickness = 3;                             // Slider handle stroke thickness    
+        this.handleStrokeThickness = 2;                             // Slider handle stroke thickness
         this.mouseDown = false;                                     // Is mouse down
         this.currentValue = 0;                                      // Current value
     }
@@ -45,6 +45,9 @@ class Slider {
 
         // Draw slider
         this.drawSlider(svg);
+
+        //Draw text
+        this.drawText(svg);
 
         // Event listeners
         svgContainer.addEventListener('mousedown', this.mouseTouchStart.bind(this), false);
@@ -74,7 +77,6 @@ class Slider {
         const sliderGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         sliderGroup.setAttribute('class', 'sliderSingle');
         sliderGroup.setAttribute('transform', 'rotate(-90,' + this.cx + ',' + this.cy + ')');
-        sliderGroup.setAttribute('rad', this.sliderRadius);
         svg.appendChild(sliderGroup);
 
         // Calculate initial angle
@@ -86,9 +88,6 @@ class Slider {
 
         // Draw handle
         this.drawHandle(slider, initialAngle, sliderGroup);
-
-        //Draw text
-        this.drawText(sliderGroup);
     }
 
     /**
@@ -146,12 +145,11 @@ class Slider {
      */
     drawText(group) {
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('transform', 'rotate(90, 0, 0)');
-        text.setAttribute('x', '200');
-        text.setAttribute('y', '-350');
+        text.setAttribute('x', this.cx);
+        text.setAttribute('y', '40');
         text.classList.add('sliderValue');
         text.style.textAnchor = 'middle';
-        text.style.fontSize = '3em';
+        text.style.fontSize = '2em';
         text.textContent = this.slider.initialValue;
         group.appendChild(text);
     }
@@ -164,7 +162,6 @@ class Slider {
     redrawSlider(rmc) {
         const sliderGroup = this.container.querySelector('.rate-slider g')
         const activePath = sliderGroup.querySelector('.sliderSinglePathActive');
-        const radius = +sliderGroup.getAttribute('rad');
         let currentAngle = this.calculateMouseAngle(rmc) * 0.999;
         const newValue = this.calculateValue(currentAngle);
 
@@ -176,16 +173,16 @@ class Slider {
         currentAngle = this.calculateAngle(newValue);
 
         // Redraw active path
-        activePath.setAttribute('d', this.describeArc(this.cx, this.cy, radius, this.minAngle, this.radiansToDegrees(currentAngle)));
+        activePath.setAttribute('d', this.describeArc(this.cx, this.cy, this.sliderRadius, this.minAngle, this.radiansToDegrees(currentAngle)));
 
         // Redraw handle
         const handle = sliderGroup.querySelector('.sliderHandle');
-        const handleCenter = this.calculateHandleCenter(currentAngle, radius);
+        const handleCenter = this.calculateHandleCenter(currentAngle, this.sliderRadius);
         handle.setAttribute('cx', handleCenter.x);
         handle.setAttribute('cy', handleCenter.y);
 
         // Redraw text
-        const text = sliderGroup.querySelector('.sliderValue');
+        const text = this.container.querySelector('.sliderValue');
         text.textContent = newValue;
     }
 
