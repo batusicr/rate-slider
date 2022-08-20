@@ -47,9 +47,6 @@ class Slider {
         // Draw slider
         this.drawSingleSliderOnInit(svg);
 
-        // Create legend UI
-        this.createLegendUI();
-
         // Event listeners
         svgContainer.addEventListener('mousedown', this.mouseTouchStart.bind(this), false);
         svgContainer.addEventListener('touchstart', this.mouseTouchStart.bind(this), false);
@@ -153,45 +150,14 @@ class Slider {
      */
     drawText(group) {
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', '85%');
-        text.setAttribute('y', '50%');
+        text.setAttribute('transform', 'rotate(90, 0, 0)');
+        text.setAttribute('x', '200');
+        text.setAttribute('y', '-350');
         text.classList.add('sliderValue');
+        text.style.textAnchor = 'middle';
+        text.style.fontSize = '3em';
         text.textContent = this.slider.initialValue;
         group.appendChild(text);
-    }
-
-    /**
-     * Create legend UI on init
-     * 
-     */
-    createLegendUI() {
-
-        // Create legend
-        const display = document.createElement('ul');
-        display.classList.add('slider__legend');
-
-        // Legend heading
-        const heading = document.createElement('h2');
-        heading.innerText = 'Legend';
-        display.appendChild(heading);
-
-        // Legend for slider
-        const li = document.createElement('li');
-        const firstSpan = document.createElement('span');
-        firstSpan.style.backgroundColor = this.slider.color ?? '#FF5733';
-        firstSpan.classList.add('colorSquare');
-        const secondSpan = document.createElement('span');
-        secondSpan.innerText = this.slider.displayName ?? 'Unnamed value';
-        const thirdSpan = document.createElement('span');
-        thirdSpan.innerText = this.slider.initialValue ?? 0;
-        thirdSpan.classList.add('sliderValue');
-        li.appendChild(firstSpan);
-        li.appendChild(secondSpan);
-        li.appendChild(thirdSpan);
-        display.appendChild(li);
-
-        // Append to DOM
-        this.container.appendChild(display);
     }
 
     /**
@@ -222,8 +188,9 @@ class Slider {
         handle.setAttribute('cx', handleCenter.x);
         handle.setAttribute('cy', handleCenter.y);
 
-        // Update legend
-        this.updateLegendUI();
+        // Redraw text
+        const text = sliderGroup.querySelector('.sliderValue');
+        text.textContent = newValue;
     }
 
     /**
@@ -257,14 +224,6 @@ class Slider {
         const offset = (this.maxAngle - this.minAngle) / maxNumOfSteps;
 
         return this.degreesToRadians((currentValue / this.slider.step * offset) + this.minAngle);
-    }
-
-    /**
-     * Update legend UI
-     */
-    updateLegendUI() {
-        const targetLegend = document.querySelector('span[class="sliderValue"]');
-        targetLegend.innerText = this.currentValue;
     }
 
     /**
