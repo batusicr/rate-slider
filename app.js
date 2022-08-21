@@ -189,7 +189,7 @@ class Slider {
      * @param {obj} rmc
      */
     redrawSlider(rmc) {
-        const sliderGroup = this.container.querySelector('.rate-slider g')
+        const sliderGroup = this.container.querySelector('.rate-slider g');
         const activePath = sliderGroup.querySelector('.sliderSinglePathActive');
         let currentAngle = this.calculateMouseAngle(rmc) * 0.999;
         const newValue = this.calculateValue(currentAngle);
@@ -250,20 +250,27 @@ class Slider {
 
     /**
      * Mouse down / Touch start event
-     * 
-     * @param {object} e 
+     *
+     * @param {object} e
      */
     mouseTouchStart(e) {
         if (this.mouseDown) return;
         this.mouseDown = true;
+
+        if (e instanceof TouchEvent) {
+            const sliderGroup = this.container.querySelector('.rate-slider g');
+            const handle = sliderGroup.querySelector('.sliderHandle');
+            handle.setAttribute('r', this.arcFractionThickness * 1.5);
+        }
+
         const rmc = this.getRelativeMouseOrTouchCoordinates(e);
         this.redrawSlider(rmc);
     }
 
     /**
      * Mouse move / touch move event
-     * 
-     * @param {object} e 
+     *
+     * @param {object} e
      */
     mouseTouchMove(e) {
         if (!this.mouseDown) return;
@@ -280,6 +287,10 @@ class Slider {
     mouseTouchEnd() {
         if (!this.mouseDown) return;
         this.mouseDown = false;
+
+        const sliderGroup = this.container.querySelector('.rate-slider g');
+        const handle = sliderGroup.querySelector('.sliderHandle');
+        handle.setAttribute('r', this.arcFractionThickness);
     }
 
     /**
