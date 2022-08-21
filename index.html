@@ -14,6 +14,9 @@
 <body>
 
     <div class="container">
+        <div class="button-container">
+            <button type="button" id="printValue"> Print value in console</button>
+        </div>
         <!-- slider app container -->
         <div id="app"></div>
     </div>
@@ -29,6 +32,10 @@
         // instantiate the slider
         const slider = new Slider(opts);
         slider.draw();
+
+        document.getElementById('printValue').addEventListener('click', function (e) {
+            console.log(slider.getValue());
+        });
     </script>
 </body>
 

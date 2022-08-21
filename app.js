@@ -36,6 +36,13 @@ class Slider {
     }
 
     /**
+     * Gets slider current value
+     */
+    getValue() {
+        return this.currentValue;
+    }
+
+    /**
      * Draw slider on init
      */
     draw() {
