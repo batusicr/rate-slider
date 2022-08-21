@@ -6,7 +6,7 @@ class Slider {
      * @param {string} DOM selector
      * @param {array} sliders
      */
-    constructor({ DOMselector, slider }) {
+    constructor({ DOMselector }) {
         this.DOMselector = DOMselector;
         this.container = document.querySelector(this.DOMselector);  // Slider container
         this.minAngle = 36;                                         // Slider minimum angle
@@ -17,11 +17,13 @@ class Slider {
         this.cx = this.sliderWidth / 2;                             // Slider center X coordinate
         this.cy = this.sliderHeight / 2;                            // Slider center Y coordinate
         this.tau = 2 * Math.PI;                                     // Tau constant
+
         this.arcFractionThickness = 8;                              // Arc fraction thickness
+        this.arcActiveFractionThickness = 4;                        // Arc active fraction thickness
         this.arcBgFractionColor = '#D8D8D8';                        // Arc fraction color for background slider
-        this.handleFillColor = '#fff';                              // Slider handle fill color
+        this.handleFillColor = '#f7f7f7';                           // Slider handle fill color
         this.handleStrokeColor = '#888888';                         // Slider handle stroke color
-        this.handleStrokeThickness = 2;                             // Slider handle stroke thickness
+        this.handleStrokeThickness = 1;                             // Slider handle stroke thickness
         this.mouseDown = false;                                     // Is mouse down
         this.currentValue = 0;                                      // Current value
 
@@ -97,11 +99,12 @@ class Slider {
 
         // Draw slider ticks
         path = sliderGroup.appendChild(this.drawArcPath(this.arcBgFractionColor, this.sliderRadius - 4, this.maxAngle, 'bg'));
-        path.style.strokeDasharray = '2 17';
+        path.style.strokeDasharray = '1 18';
         path.style.strokeDashoffset = '0';
 
         // Draw active slider background
-        sliderGroup.appendChild(this.drawArcPath(this.slider.color, this.sliderRadius, initialAngle, 'active'));
+        path = sliderGroup.appendChild(this.drawArcPath(this.slider.color, this.sliderRadius, initialAngle, 'active'));
+        path.style.strokeWidth = this.arcActiveFractionThickness;
 
         // Draw handle
         sliderGroup.appendChild(this.drawHandle(slider, initialAngle));
@@ -163,10 +166,10 @@ class Slider {
     drawText() {
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', this.cx);
-        text.setAttribute('y', '40');
+        text.setAttribute('y', '35');
         text.classList.add('sliderValue');
         text.style.textAnchor = 'middle';
-        text.style.fontSize = '2em';
+        text.style.fontSize = '1.5em';
         text.textContent = this.slider.initialValue;
 
         return text;
