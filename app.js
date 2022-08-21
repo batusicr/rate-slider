@@ -20,8 +20,8 @@ class Slider {
 
         this.arcFractionThickness = 8;                              // Arc fraction thickness
         this.arcActiveFractionThickness = 4;                        // Arc active fraction thickness
-        this.arcBgFractionColor = '#D8D8D8';                        // Arc fraction color for background slider
-        this.handleFillColor = '#f7f7f7';                           // Slider handle fill color
+        this.arcBgFractionColor = '#CCCCCC';                        // Arc fraction color for background slider
+        this.handleFillColor = '#fafafa';                           // Slider handle fill color
         this.handleStrokeColor = '#888888';                         // Slider handle stroke color
         this.handleStrokeThickness = 1;                             // Slider handle stroke thickness
         this.mouseDown = false;                                     // Is mouse down
@@ -92,22 +92,23 @@ class Slider {
         // Draw slider background
         sliderGroup.appendChild(this.drawArcPath(this.arcBgFractionColor, this.sliderRadius, this.maxAngle, 'bg'));
 
-        // Draw slider points
-        path = sliderGroup.appendChild(this.drawArcPath(this.arcBgFractionColor, this.sliderRadius - 8, this.maxAngle, 'bg'));
-        path.style.strokeDasharray = '2 34';
-        path.style.strokeDashoffset = '0';
-
         // Draw slider ticks
         path = sliderGroup.appendChild(this.drawArcPath(this.arcBgFractionColor, this.sliderRadius - 4, this.maxAngle, 'bg'));
-        path.style.strokeDasharray = '1 18';
-        path.style.strokeDashoffset = '0';
+        path.style.strokeDasharray = '1 37.2';
+        path.style.strokeDashoffset = '19.6';
 
         // Draw active slider background
         path = sliderGroup.appendChild(this.drawArcPath(this.slider.color, this.sliderRadius, initialAngle, 'active'));
         path.style.strokeWidth = this.arcActiveFractionThickness;
 
+        // Draw slider points
+        this.drawPoints(sliderGroup);
+
         // Draw handle
-        sliderGroup.appendChild(this.drawHandle(slider, initialAngle));
+        path = sliderGroup.appendChild(this.drawHandle(initialAngle, this.arcFractionThickness));
+        path.classList.add('sliderHandle');
+        path.style.stroke = this.slider.color;
+        path.style.fill = '#fce7dc';
 
         return sliderGroup;
     }
@@ -136,14 +137,22 @@ class Slider {
         return path;
     }
 
+    drawPoints(container) {
+        for (let i = this.slider.min; i <= this.slider.max; i += 2*this.slider.step) {
+            const point = this.drawHandle(this.calculateAngle(i), this.arcFractionThickness - 2);
+            point.style.stroke = this.arcBgFractionColor;
+            container.appendChild(point);
+        }
+    }
+
     /**
      * Draw handle for single slider
-     * 
-     * @param {object} slider 
+     *
      * @param {number} initialAngle
+     * @param {radius} radius
      * @returns {element} handle
      */
-    drawHandle(slider, initialAngle) {
+    drawHandle(initialAngle, radius) {
         // Calculate handle center
         const handleCenter = this.calculateHandleCenter(initialAngle * this.tau / 360, this.sliderRadius);
 
@@ -151,8 +160,7 @@ class Slider {
         const handle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         handle.setAttribute('cx', handleCenter.x);
         handle.setAttribute('cy', handleCenter.y);
-        handle.setAttribute('r', this.arcFractionThickness);
-        handle.classList.add('sliderHandle');
+        handle.setAttribute('r', radius);
         handle.style.stroke = this.handleStrokeColor;
         handle.style.strokeWidth = this.handleStrokeThickness;
         handle.style.fill = this.handleFillColor;
@@ -194,11 +202,11 @@ class Slider {
         currentAngle = this.calculateAngle(newValue);
 
         // Redraw active path
-        activePath.setAttribute('d', this.describeArc(this.cx, this.cy, this.sliderRadius, this.minAngle, this.radiansToDegrees(currentAngle)));
+        activePath.setAttribute('d', this.describeArc(this.cx, this.cy, this.sliderRadius, this.minAngle, currentAngle));
 
         // Redraw handle
         const handle = sliderGroup.querySelector('.sliderHandle');
-        const handleCenter = this.calculateHandleCenter(currentAngle, this.sliderRadius);
+        const handleCenter = this.calculateHandleCenter(this.degreesToRadians(currentAngle), this.sliderRadius);
         handle.setAttribute('cx', handleCenter.x);
         handle.setAttribute('cy', handleCenter.y);
 
@@ -237,7 +245,7 @@ class Slider {
         const maxNumOfSteps = (this.slider.max - this.slider.min) / this.slider.step;
         const offset = (this.maxAngle - this.minAngle) / maxNumOfSteps;
 
-        return this.degreesToRadians((currentValue / this.slider.step * offset) + this.minAngle);
+        return (currentValue / this.slider.step * offset) + this.minAngle;
     }
 
     /**
