@@ -9,7 +9,6 @@ class Slider {
     constructor({ DOMselector, slider }) {
         this.DOMselector = DOMselector;
         this.container = document.querySelector(this.DOMselector);  // Slider container
-        this.slider = slider;                                       // Slider options
         this.minAngle = 36;                                         // Slider minimum angle
         this.maxAngle = 324;                                        // Slider maximum angle
         this.sliderRadius = 80;                                     // Slider radius
@@ -25,29 +24,36 @@ class Slider {
         this.handleStrokeThickness = 2;                             // Slider handle stroke thickness
         this.mouseDown = false;                                     // Is mouse down
         this.currentValue = 0;                                      // Current value
+
+        //Slider configuration
+        this.slider = {
+            color: '#FF5733',
+            min: 0,
+            max: 10,
+            step: 0.5,
+            initialValue: 0
+        };
     }
 
     /**
      * Draw slider on init
-     * 
      */
     draw() {
-        // Create SVG
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('viewBox', `0, 0, ${this.sliderWidth}, ${this.sliderHeight}`)
-
         // Create SVG container
         const svgContainer = document.createElement('div');
         svgContainer.classList.add('rate-slider');
-        svgContainer.appendChild(svg);
-
         this.container.appendChild(svgContainer);
 
+        // Create SVG
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', `0, 0, ${this.sliderWidth}, ${this.sliderHeight}`)
+        svgContainer.appendChild(svg);
+
         // Draw slider
-        this.drawSlider(svg);
+        svg.appendChild(this.drawSlider(svg));
 
         //Draw text
-        this.drawText(svg);
+        svg.appendChild(this.drawText());
 
         // Event listeners
         svgContainer.addEventListener('mousedown', this.mouseTouchStart.bind(this), false);
@@ -62,45 +68,50 @@ class Slider {
      * Draw slider
      * 
      * @param {object} svg
+     * @returns {element} slider group
      */
     drawSlider(svg) {
-        const slider = this.slider;
+        let path;
 
-        // Default slider options
-        slider.color = slider.color ?? '#FF5733';
-        slider.min = 0;
-        slider.max = 10;
-        slider.step = 0.5;
-        slider.initialValue = 0;
-
-        // Create a single slider group - holds all paths and handle
+        // Create a slider group
         const sliderGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        sliderGroup.setAttribute('class', 'sliderSingle');
         sliderGroup.setAttribute('transform', 'rotate(-90,' + this.cx + ',' + this.cy + ')');
-        svg.appendChild(sliderGroup);
 
         // Calculate initial angle
-        const initialAngle = Math.floor((slider.initialValue / (slider.max - slider.min)) * 360) + this.minAngle;
-        
-        // Draw background and active arc paths
-        this.drawArcPath(this.arcBgFractionColor, this.sliderRadius, this.maxAngle, 'bg', sliderGroup);
-        this.drawArcPath(slider.color, this.sliderRadius, initialAngle, 'active', sliderGroup);
+        const initialAngle = Math.floor((this.slider.initialValue / (this.slider.max - this.slider.min)) * 360) + this.minAngle;
+
+        // Draw slider background
+        sliderGroup.appendChild(this.drawArcPath(this.arcBgFractionColor, this.sliderRadius, this.maxAngle, 'bg'));
+
+        // Draw slider points
+        path = sliderGroup.appendChild(this.drawArcPath(this.arcBgFractionColor, this.sliderRadius - 8, this.maxAngle, 'bg'));
+        path.style.strokeDasharray = '2 34';
+        path.style.strokeDashoffset = '0';
+
+        // Draw slider ticks
+        path = sliderGroup.appendChild(this.drawArcPath(this.arcBgFractionColor, this.sliderRadius - 4, this.maxAngle, 'bg'));
+        path.style.strokeDasharray = '2 17';
+        path.style.strokeDashoffset = '0';
+
+        // Draw active slider background
+        sliderGroup.appendChild(this.drawArcPath(this.slider.color, this.sliderRadius, initialAngle, 'active'));
 
         // Draw handle
-        this.drawHandle(slider, initialAngle, sliderGroup);
+        sliderGroup.appendChild(this.drawHandle(slider, initialAngle));
+
+        return sliderGroup;
     }
 
     /**
      * Output arch path
-     * 
-     * @param {number} cx 
-     * @param {number} cy 
-     * @param {string} color 
+     *
+     * @param {string} color
+     * @param {radius} radius
      * @param {number} angle
-     * @param {string} type 
+     * @param {string} type
+     * @returns {element} path
      */
-    drawArcPath( color, radius, angle, type, group ) {
-
+    drawArcPath(color, radius, angle, type) {
         // Slider path class
         const pathClass = (type === 'active') ? 'sliderSinglePathActive' : 'sliderSinglePath';
 
@@ -111,18 +122,18 @@ class Slider {
         path.style.stroke = color;
         path.style.strokeWidth = this.arcFractionThickness;
         path.style.fill = 'none';
-        group.appendChild(path);
+
+        return path;
     }
 
     /**
      * Draw handle for single slider
      * 
      * @param {object} slider 
-     * @param {number} initialAngle 
-     * @param {group} group 
+     * @param {number} initialAngle
+     * @returns {element} handle
      */
-    drawHandle(slider, initialAngle, group) {
-
+    drawHandle(slider, initialAngle) {
         // Calculate handle center
         const handleCenter = this.calculateHandleCenter(initialAngle * this.tau / 360, this.sliderRadius);
 
@@ -135,15 +146,14 @@ class Slider {
         handle.style.stroke = this.handleStrokeColor;
         handle.style.strokeWidth = this.handleStrokeThickness;
         handle.style.fill = this.handleFillColor;
-        group.appendChild(handle);
+
+        return handle;
     }
 
     /**
      * Draw text for slider
-     *
-     * @param {group} group
      */
-    drawText(group) {
+    drawText() {
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', this.cx);
         text.setAttribute('y', '40');
@@ -151,7 +161,8 @@ class Slider {
         text.style.textAnchor = 'middle';
         text.style.fontSize = '2em';
         text.textContent = this.slider.initialValue;
-        group.appendChild(text);
+
+        return text;
     }
 
     /**
