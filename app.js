@@ -73,7 +73,7 @@ class Slider {
         let sliderElement;
 
         // Calculate initial angle
-        const initialAngle = Math.floor((this.slider.initialValue / (this.slider.max - this.slider.min)) * 360) + this._minAngle;
+        const initialAngle = this._calculateAngle(this.slider.initialValue);
 
         // Create a slider group
         const sliderGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -262,7 +262,7 @@ class Slider {
 
         this.mouseDown = true;
 
-        if (e instanceof TouchEvent) {
+        if (window.TouchEvent && e instanceof TouchEvent) {
             // Increase handle side on touch start event by 50%
             this._sliderHandle.setAttribute('r', (this._arcThickness * 1.5));
         }
@@ -294,7 +294,7 @@ class Slider {
             return;
         }
 
-        if (e instanceof TouchEvent) {
+        if (window.TouchEvent && e instanceof TouchEvent) {
             // Reset handle side on touch end event
             this._sliderHandle.setAttribute('r', this._arcThickness);
         }
@@ -312,7 +312,7 @@ class Slider {
         const containerRect = this._svgContainer.getBoundingClientRect();
         let x, y, clientPosX, clientPosY;
 
-        if (e instanceof TouchEvent) {
+        if (window.TouchEvent && e instanceof TouchEvent) {
             clientPosX = e.touches[0].pageX;
             clientPosY = e.touches[0].pageY;
         } else {
@@ -414,6 +414,3 @@ class Slider {
         return angle * Math.PI / 180;
     }
 }
-
-  
-  
