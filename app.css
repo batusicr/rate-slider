@@ -62,10 +62,17 @@ body {
 
 .button-container {
   width: 100%;
-  text-align: right;
+  text-align: center;
   padding: 10px;
 }
 
 .button-container button {
-  padding: 4px;
+  cursor: pointer;
+  padding: 1rem;
+  font-size: 1rem;
+  color: #fff;
+  border: none;
+  border-radius: 1rem;
+  background-color: #ff5733;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
 }
